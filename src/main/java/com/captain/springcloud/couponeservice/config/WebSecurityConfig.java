@@ -21,7 +21,7 @@ public class WebSecurityConfig {
         http.httpBasic(Customizer.withDefaults());
 
         http.authorizeHttpRequests(authorize ->
-                authorize.requestMatchers(HttpMethod.GET, "/couponapi/coupons/**")
+                authorize.requestMatchers(HttpMethod.GET, "/couponapi/coupons/{code:^[A-Z]*$}")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/couponapi/coupons").hasRole("ADMIN"));
 
