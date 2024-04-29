@@ -51,7 +51,7 @@ public class WebSecurityConfig {
                         .hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/couponapi/coupons", "saveCoupon").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/getCoupon").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/", "/login").permitAll());
+                        .requestMatchers("/", "/login", "/showReg", "/registerUser").permitAll());
 
         http.logout().logoutSuccessUrl("/");
         http.csrf(csrf -> csrf.disable());
