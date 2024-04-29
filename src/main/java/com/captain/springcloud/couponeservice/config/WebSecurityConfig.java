@@ -53,6 +53,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/getCoupon").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/", "/login").permitAll());
 
+        http.logout().logoutSuccessUrl("/");
         http.csrf(csrf -> csrf.disable());
         http.securityContext(context -> context.requireExplicitSave(true));
         return http.build();
