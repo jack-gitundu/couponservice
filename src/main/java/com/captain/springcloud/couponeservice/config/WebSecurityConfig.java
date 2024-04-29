@@ -12,12 +12,21 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 public class WebSecurityConfig {
 
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Bean
+    SecurityContextRepository securityContextRepository() {
+        return new DelegatingSecurityContextRepository(new RequestAttributeSecurityContextRepository(), new HttpSessionSecurityContextRepository());
+    }
 
     @Bean
     BCryptPasswordEncoder passwordEncoder() {
@@ -46,6 +55,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/getCoupon").hasAnyRole("USER", "ADMIN"));
 
         http.csrf(csrf -> csrf.disable());
+        http.securityContext(context -> context.requireExplicitSave(true));
         return http.build();
     }
 }
