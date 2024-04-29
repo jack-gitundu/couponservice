@@ -43,16 +43,15 @@ public class WebSecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.formLogin();
-
         http.authorizeHttpRequests(authorize ->
                 authorize
-                        .requestMatchers(HttpMethod.GET, "/couponapi/coupons/{code:^[A-Z]*$}", "/", "/showGetCoupon", "/getCoupon")
+                        .requestMatchers(HttpMethod.GET, "/couponapi/coupons/{code:^[A-Z]*$}", "/showGetCoupon", "/getCoupon")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/showCreateCoupon", "/createCoupon", "/createResponse")
                         .hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/couponapi/coupons", "saveCoupon").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/getCoupon").hasAnyRole("USER", "ADMIN"));
+                        .requestMatchers(HttpMethod.POST, "/getCoupon").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/", "/login").permitAll());
 
         http.csrf(csrf -> csrf.disable());
         http.securityContext(context -> context.requireExplicitSave(true));

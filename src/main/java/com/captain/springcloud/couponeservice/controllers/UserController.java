@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class UserController {
@@ -19,8 +19,9 @@ public class UserController {
         return "login";
     }
 
-    public String login(@RequestParam String username, String password, HttpServletRequest request, HttpServletResponse response) {
-        boolean loginResponse = securityService.login(username, password, request, response);
+    @PostMapping("/login")
+    public String login(String email, String password, HttpServletRequest request, HttpServletResponse response) {
+        boolean loginResponse = securityService.login(email, password, request, response);
         if (loginResponse) {
             return "index";
         }
