@@ -7,7 +7,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +15,10 @@ import org.springframework.security.web.context.DelegatingSecurityContextReposit
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 public class WebSecurityConfig {
@@ -54,7 +57,13 @@ public class WebSecurityConfig {
                         .requestMatchers("/", "/login", "/showReg", "/registerUser").permitAll());
 
         http.logout().logoutSuccessUrl("/");
-        http.csrf(csrf -> csrf.disable());
+//        http.csrf(csrf -> csrf.disable());
+        http.csrf(csrfCustomizer -> {
+            csrfCustomizer.ignoringRequestMatchers("/couponapi/coupons/**");
+            RequestMatcher requestMatcher = new RegexRequestMatcher("/couponapi/coupons/{code:^[A-Z]*$}", "POST");
+            requestMatcher = new MvcRequestMatcher(new HandlerMappingIntrospector(), "/getCoupon");
+            csrfCustomizer.ignoringRequestMatchers(requestMatcher);
+        });
         http.securityContext(context -> context.requireExplicitSave(true));
         return http.build();
     }
