@@ -18,7 +18,11 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
+import java.util.List;
 
 @Configuration
 public class WebSecurityConfig {
@@ -49,7 +53,8 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(authorize ->
                 authorize
                         .requestMatchers(HttpMethod.GET, "/couponapi/coupons/{code:^[A-Z]*$}", "/showGetCoupon", "/getCoupon")
-                        .hasAnyRole("USER", "ADMIN")
+//                        .hasAnyRole("USER", "ADMIN")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/showCreateCoupon", "/createCoupon", "/createResponse")
                         .hasAnyRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/couponapi/coupons", "saveCoupon").hasRole("ADMIN")
@@ -57,13 +62,23 @@ public class WebSecurityConfig {
                         .requestMatchers("/", "/login", "/showReg", "/registerUser").permitAll());
 
         http.logout().logoutSuccessUrl("/");
-//        http.csrf(csrf -> csrf.disable());
-        http.csrf(csrfCustomizer -> {
-            csrfCustomizer.ignoringRequestMatchers("/couponapi/coupons/**");
-            RequestMatcher requestMatcher = new RegexRequestMatcher("/couponapi/coupons/{code:^[A-Z]*$}", "POST");
-            requestMatcher = new MvcRequestMatcher(new HandlerMappingIntrospector(), "/getCoupon");
-            csrfCustomizer.ignoringRequestMatchers(requestMatcher);
+
+        http.cors(corsCustomizer -> {
+            CorsConfigurationSource configurationSource = request -> {
+                CorsConfiguration corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowedOrigins(List.of("localhost:3000"));
+                corsConfiguration.setAllowedMethods(List.of("GET"));
+                return corsConfiguration;
+            };
+            corsCustomizer.configurationSource(configurationSource);
         });
+//        http.csrf(csrf -> csrf.disable());
+//        http.csrf(csrfCustomizer -> {
+//            csrfCustomizer.ignoringRequestMatchers("/couponapi/coupons/**");
+//            RequestMatcher requestMatcher = new RegexRequestMatcher("/couponapi/coupons/{code:^[A-Z]*$}", "POST");
+//            requestMatcher = new MvcRequestMatcher(new HandlerMappingIntrospector(), "/getCoupon");
+//            csrfCustomizer.ignoringRequestMatchers(requestMatcher);
+//        });
         http.securityContext(context -> context.requireExplicitSave(true));
         return http.build();
     }
