@@ -9,10 +9,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -55,4 +53,17 @@ class CouponeserviceApplicationTests {
                 .content("{\"code\":\"SUPERSALECSRF\",\"discount\":80.000,\"expDate\":\"12/12/2025\"}")
                 .contentType(MediaType.APPLICATION_JSON).with(csrf().asHeader())).andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser(roles = {"USER"})
+    public void textCORS() throws Exception {
+        mvc.perform(options("/couponapi/coupons")
+                        .header("Access-Control-Allow-Methods", "POST")
+                        .header("Origin", "http://localhost:9091")).andExpect(status().isOk())
+                .andExpect(header().exists("Access-Control-Allow-Origin"))
+                .andExpect(header().string("Access-Control-Allow-Origin", "*"))
+                .andExpect(header().exists("Access-Control-Allow-Methods"))
+                .andExpect(header().string("Access-Control-Allow-Methods", "POST"));
+    }
+
 }
