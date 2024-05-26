@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -25,7 +26,8 @@ class CouponeserviceApplicationTests {
     }
 
     @Test
-    @WithMockUser(roles = {"USER"})
+//    @WithMockUser(roles = {"USER"})
+    @WithUserDetails("doug@bailey.com")
     public void testGetCouponWithAuth_Success() throws Exception {
         mvc.perform(get("/couponapi/coupons/SUPERSALE")).andExpect(content().string("{\"id\":1,\"code\":\"SUPERSALE\",\"discount\":10.000,\"expDate\":\"12/12/2025\"}"));
     }
